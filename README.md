@@ -1,5 +1,7 @@
 # nixpkgs-bin
 
+[![Update tools](https://github.com/ctran/nixpkgs-bin/actions/workflows/update.yml/badge.svg)](https://github.com/ctran/nixpkgs-bin/actions/workflows/update.yml)
+
 Prebuilt upstream binaries packaged for Nix. This is a small personal package
 set, not an official NixOS project and not part of nixpkgs.
 
@@ -40,15 +42,19 @@ Linux uses statically linked musl binaries.
 
 ## Installation
 
-Replace `YOUR_USERNAME` with your GitHub user or organization.
-
 ```bash
-nix profile add github:YOUR_USERNAME/nixpkgs-bin#mise   # one tool
-nix profile add github:YOUR_USERNAME/nixpkgs-bin#all    # every tool in the flake
-nix run github:YOUR_USERNAME/nixpkgs-bin#mise -- --version
+nix profile add github:ctran/nixpkgs-bin#mise   # one tool
+nix profile add github:ctran/nixpkgs-bin#all    # every tool in the flake
+nix run github:ctran/nixpkgs-bin#mise -- --version
 ```
 
-`#default` is mise. From a local checkout use `.#mise` instead.
+`#default` is mise. To work from a local checkout:
+
+```bash
+git clone https://github.com/ctran/nixpkgs-bin.git
+cd nixpkgs-bin
+nix profile add .#mise
+```
 
 Upgrade or remove:
 
@@ -68,7 +74,7 @@ nix profile remove mise
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixpkgs-bin = {
-      url = "github:YOUR_USERNAME/nixpkgs-bin";
+      url = "github:ctran/nixpkgs-bin";
       inputs.nixpkgs.follows = "nixpkgs"; # avoid a second nixpkgs
     };
   };
