@@ -1,58 +1,51 @@
 {
-  description = "Mise prebuilt binary from GitHub Releases";
+  description = "Prebuilt binaries from GitHub Releases (mise and friends)";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
   outputs = { self, nixpkgs }:
     let
-      version = "2026.11.2";
+      inherit (nixpkgs) lib;
 
-      platforms = {
-        "aarch64-darwin" = "macos-arm64";
-        "x86_64-darwin" = "macos-x64";
-        "aarch64-linux" = "linux-arm64-musl";
-        "x86_64-linux" = "linux-x64-musl";
-      };
+      # x86_64-darwin is left out because nixpkgs-unstable (26.11) no longer
+      # evaluates it. Intel Macs can still use `overlays.default` on a nixpkgs
+      # that supports them (e.g. nixpkgs-26.05-darwin); the sources keep its hashes.
+      systems = [ "aarch64-darwin" "aarch64-linux" "x86_64-linux" ];
 
-      # From SHASUMS256.txt of the GitHub release
-      hashes = {
-        "aarch64-darwin" = "sha256-kGhNE9kSXPIHxFsZ29vxm6+NXQ4+EBCfI2sbTQJ0FsA=";
-        "x86_64-darwin" = "sha256-t9Eu9/+f1RhwSEueMv6HMDix8ZvV5Fg5GWvAeuc69yo=";
-        "aarch64-linux" = "sha256-+QNrnNmfnKbfEwtgu0V9Ptp/vAnYwCQtxNgZ9EEKS5E=";
-        "x86_64-linux" = "sha256-+k8Qr4PnExhUzuzfkJ/E5HF8i01OuSHPOEUdYfEY0mc=";
-      };
+      # One package per sources/<name>.json
+      sources = lib.mapAttrs'
+        (file: _: lib.nameValuePair
+          (lib.removeSuffix ".json" file)
+          (lib.importJSON ./sources/${file}))
+        (lib.filterAttrs
+          (file: type: type == "regular" && lib.hasSuffix ".json" file)
+          (builtins.readDir ./sources));
 
-      forAllSystems = f:
-        nixpkgs.lib.genAttrs
-          (builtins.attrNames platforms)
-          (system: f system);
+      # All packages that have a binary for `system`, built with `pkgs`.
+      # (The overlay passes prev's system so the attribute names don't depend
+      # on `final`, which would recurse.)
+      mkPackages = pkgs: system:
+        lib.mapAttrs
+          (pname: source: pkgs.callPackage ./nix/prebuilt.nix { inherit pname source; })
+          (lib.filterAttrs (_: source: source.platforms ? ${system}) sources);
 
-    in {
-      packages = forAllSystems (system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-          platform = platforms.${system};
-
-          binary = pkgs.fetchurl {
-            url = "https://github.com/jdx/mise/releases/download/v${version}/mise-v${version}-${platform}";
-            hash = hashes.${system};
+      forAllSystems = f: lib.genAttrs systems (system: f nixpkgs.legacyPackages.${system});
+    in
+    {
+      packages = forAllSystems (pkgs:
+        let tools = mkPackages pkgs pkgs.stdenv.hostPlatform.system; in
+        tools // {
+          default = tools.mise;
+          # Every tool in one profile entry: `nix profile add .#all`
+          all = pkgs.buildEnv {
+            name = "nix-mise-all";
+            paths = builtins.attrValues tools;
           };
-        in {
-          mise = pkgs.stdenvNoCC.mkDerivation {
-            pname = "mise";
-            inherit version;
+        });
 
-            dontUnpack = true;
+      # Adds (or overrides) pkgs.<name> for each tool.
+      overlays.default = final: prev: mkPackages final prev.stdenv.hostPlatform.system;
 
-            installPhase = ''
-              runHook preInstall
-              install -Dm755 ${binary} $out/bin/mise
-              runHook postInstall
-            '';
-          };
-
-          default = self.packages.${system}.mise;
-        }
-      );
+      checks = forAllSystems (pkgs: mkPackages pkgs pkgs.stdenv.hostPlatform.system);
     };
 }

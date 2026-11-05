@@ -1,0 +1,29 @@
+{
+  "repo": "jdx/mise",
+  "description": "Dev tools, env vars and task runner",
+  "homepage": "https://mise.jdx.dev",
+  "license": "mit",
+  "mainProgram": "mise",
+  "tag": "v{version}",
+  "asset": "mise-v{version}-{platform}",
+  "checksums": "SHASUMS256.txt",
+  "version": "2026.11.2",
+  "platforms": {
+    "aarch64-darwin": {
+      "platform": "macos-arm64",
+      "hash": "sha256-kGhNE9kSXPIHxFsZ29vxm6+NXQ4+EBCfI2sbTQJ0FsA="
+    },
+    "x86_64-darwin": {
+      "platform": "macos-x64",
+      "hash": "sha256-t9Eu9/+f1RhwSEueMv6HMDix8ZvV5Fg5GWvAeuc69yo="
+    },
+    "aarch64-linux": {
+      "platform": "linux-arm64-musl",
+      "hash": "sha256-+QNrnNmfnKbfEwtgu0V9Ptp/vAnYwCQtxNgZ9EEKS5E="
+    },
+    "x86_64-linux": {
+      "platform": "linux-x64-musl",
+      "hash": "sha256-+k8Qr4PnExhUzuzfkJ/E5HF8i01OuSHPOEUdYfEY0mc="
+    }
+  }
+}

@@ -1,0 +1,83 @@
+name: Update tools
+
+on:
+  workflow_dispatch:
+    inputs:
+      tool:
+        description: "Tool to update (a sources/<tool>.json name). Leave empty for all."
+        required: false
+        default: ""
+      version:
+        description: "Version to pin (requires a tool). Leave empty for the latest release."
+        required: false
+        default: ""
+  schedule:
+    - cron: "0 6 * * *" # daily at 06:00 UTC
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  list:
+    runs-on: ubuntu-latest
+    outputs:
+      tools: ${{ steps.list.outputs.tools }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: list
+        env:
+          TOOL: ${{ inputs.tool }}
+        run: |
+          if [ -n "$TOOL" ]; then
+            [ -f "sources/$TOOL.json" ] || { echo "::error::sources/$TOOL.json not found"; exit 1; }
+            tools="$(jq -cn --arg t "$TOOL" '[$t]')"
+          else
+            tools="$(ls sources/*.json | xargs -n1 basename | sed 's/\.json$//' | jq -Rnc '[inputs]')"
+          fi
+          echo "tools=$tools" >> "$GITHUB_OUTPUT"
+
+  update:
+    needs: list
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        tool: ${{ fromJSON(needs.list.outputs.tools) }}
+    concurrency:
+      group: update-${{ matrix.tool }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update sources/${{ matrix.tool }}.json
+        id: update
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ inputs.version }}
+        run: bash scripts/update.sh "${{ matrix.tool }}" "$VERSION"
+
+      - name: Install Nix
+        if: steps.update.outputs.updated == 'true'
+        uses: cachix/install-nix-action@v31
+
+      - name: Build and smoke-test
+        if: steps.update.outputs.updated == 'true'
+        run: |
+          nix build ".#${{ matrix.tool }}" --print-build-logs
+          ls -l result/bin
+          for bin in result/bin/*; do "$bin" --version; done
+
+      - name: Create pull request
+        if: steps.update.outputs.updated == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: update/${{ matrix.tool }}
+          delete-branch: true
+          add-paths: sources/${{ matrix.tool }}.json
+          commit-message: "${{ matrix.tool }}: update to ${{ steps.update.outputs.version }}"
+          title: "${{ matrix.tool }}: update to ${{ steps.update.outputs.version }}"
+          body: |
+            Updates `${{ matrix.tool }}` to ${{ steps.update.outputs.version }}.
+
+            Hashes refreshed by `scripts/update.sh`; the x86_64-linux build was verified in CI.
