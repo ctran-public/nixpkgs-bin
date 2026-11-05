@@ -5,7 +5,7 @@
 
   outputs = { self, nixpkgs }:
     let
-      version = "2026.11.1";
+      version = "2026.11.2";
 
       platforms = {
         "aarch64-darwin" = "macos-arm64";
@@ -16,10 +16,10 @@
 
       # From SHASUMS256.txt of the GitHub release
       hashes = {
-        "aarch64-darwin" = "sha256-nKEAWTD+2Q4PTDDZsT/kUw/ojQVJpxNJcWo6q5BRxic=";
-        "x86_64-darwin" = "sha256-6tJBQlHo8pCcx1ZPirX9H+6mli7XfQF3d21y4IrnR6A=";
-        "aarch64-linux" = "sha256-XOOAbxhaGgWo0M9tPro+Jla9ykbSK/hRh0pdn7iPLMI=";
-        "x86_64-linux" = "sha256-6bRQRvWF8IWaaMxyp6qqjkRjnwtkhzcmIdvvk6vAIvs=";
+        "aarch64-darwin" = "sha256-kGhNE9kSXPIHxFsZ29vxm6+NXQ4+EBCfI2sbTQJ0FsA=";
+        "x86_64-darwin" = "sha256-t9Eu9/+f1RhwSEueMv6HMDix8ZvV5Fg5GWvAeuc69yo=";
+        "aarch64-linux" = "sha256-+QNrnNmfnKbfEwtgu0V9Ptp/vAnYwCQtxNgZ9EEKS5E=";
+        "x86_64-linux" = "sha256-+k8Qr4PnExhUzuzfkJ/E5HF8i01OuSHPOEUdYfEY0mc=";
       };
 
       forAllSystems = f:
