@@ -1,8 +1,11 @@
-# nix-mise
+# nixpkgs-bin
 
-A small Nix flake that installs [mise](https://mise.jdx.dev/) — and any other
-tool you add — straight from the **official prebuilt binaries** on GitHub
-Releases, instead of building from source like `nixpkgs#mise`.
+Prebuilt upstream binaries packaged for Nix. This is a small personal package
+set, not an official NixOS project and not part of nixpkgs.
+
+Each tool is installed straight from its **official prebuilt binaries** on
+GitHub Releases instead of being built from source. It currently ships
+[mise](https://mise.jdx.dev/), as an alternative to `nixpkgs#mise`.
 
 - **Prebuilt binaries** — no Rust (or any) toolchain needed.
 - **Pinned and verified** — every binary has a fixed version and SHA-256 hash.
@@ -40,9 +43,9 @@ Linux uses statically linked musl binaries.
 Replace `YOUR_USERNAME` with your GitHub user or organization.
 
 ```bash
-nix profile add github:YOUR_USERNAME/nix-mise#mise   # one tool
-nix profile add github:YOUR_USERNAME/nix-mise#all    # every tool in the flake
-nix run github:YOUR_USERNAME/nix-mise#mise -- --version
+nix profile add github:YOUR_USERNAME/nixpkgs-bin#mise   # one tool
+nix profile add github:YOUR_USERNAME/nixpkgs-bin#all    # every tool in the flake
+nix run github:YOUR_USERNAME/nixpkgs-bin#mise -- --version
 ```
 
 `#default` is mise. From a local checkout use `.#mise` instead.
@@ -64,8 +67,8 @@ nix profile remove mise
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    nix-mise = {
-      url = "github:YOUR_USERNAME/nix-mise";
+    nixpkgs-bin = {
+      url = "github:YOUR_USERNAME/nixpkgs-bin";
       inputs.nixpkgs.follows = "nixpkgs"; # avoid a second nixpkgs
     };
   };
@@ -76,28 +79,28 @@ nix profile remove mise
 replaces the nixpkgs package of the same name:
 
 ```nix
-nixpkgs.overlays = [ inputs.nix-mise.overlays.default ];   # NixOS / Home Manager
+nixpkgs.overlays = [ inputs.nixpkgs-bin.overlays.default ];   # NixOS / Home Manager
 home.packages = [ pkgs.mise ];
 ```
 
 **Without the overlay:**
 
 ```nix
-home.packages = [ inputs.nix-mise.packages.${pkgs.stdenv.hostPlatform.system}.mise ];
+home.packages = [ inputs.nixpkgs-bin.packages.${pkgs.stdenv.hostPlatform.system}.mise ];
 ```
 
 **In a devShell:**
 
 ```nix
 devShells.${system}.default = pkgs.mkShell {
-  packages = [ inputs.nix-mise.packages.${system}.mise ];
+  packages = [ inputs.nixpkgs-bin.packages.${system}.mise ];
 };
 ```
 
 ## Repository layout
 
 ```text
-nix-mise/
+nixpkgs-bin/
 ├── flake.nix                 # outputs: packages, overlays.default, checks
 ├── flake.lock                # pins nixpkgs
 ├── nix/prebuilt.nix          # generic builder for one prebuilt release binary
@@ -209,7 +212,7 @@ keeps installs reproducible.
 
 ## Comparison with nixpkgs
 
-| | `nixpkgs#mise` | `nix-mise#mise` |
+| | `nixpkgs#mise` | `nixpkgs-bin#mise` |
 |---|---|---|
 | Source | Built from source by nixpkgs | Official GitHub release binary |
 | Needs a compiler if uncached | Yes (Rust) | No |

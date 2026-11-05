@@ -1,5 +1,5 @@
 {
-  description = "Prebuilt binaries from GitHub Releases (mise and friends)";
+  description = "Prebuilt upstream binaries from GitHub Releases, packaged for Nix";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
@@ -38,7 +38,7 @@
           default = tools.mise;
           # Every tool in one profile entry: `nix profile add .#all`
           all = pkgs.buildEnv {
-            name = "nix-mise-all";
+            name = "nixpkgs-bin-all";
             paths = builtins.attrValues tools;
           };
         });
