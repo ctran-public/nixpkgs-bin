@@ -20,7 +20,7 @@ permissions:
 
 jobs:
   list:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       tools: ${{ steps.list.outputs.tools }}
     steps:
@@ -39,7 +39,7 @@ jobs:
 
   update:
     needs: list
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
