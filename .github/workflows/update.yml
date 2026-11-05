@@ -24,7 +24,7 @@ jobs:
     outputs:
       tools: ${{ steps.list.outputs.tools }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - id: list
         env:
           TOOL: ${{ inputs.tool }}
@@ -48,7 +48,7 @@ jobs:
       group: update-${{ matrix.tool }}
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Update sources/${{ matrix.tool }}.json
         id: update
@@ -70,7 +70,7 @@ jobs:
 
       - name: Create pull request
         if: steps.update.outputs.updated == 'true'
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           branch: update/${{ matrix.tool }}
           delete-branch: true
