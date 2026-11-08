@@ -14,22 +14,27 @@ on:
   schedule:
     - cron: "0 6 * * *" # daily at 06:00 UTC
 
-permissions:
-  contents: write
-  pull-requests: write
+# Each job asks for only what it needs.
+permissions: {}
 
 jobs:
   list:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     outputs:
       tools: ${{ steps.list.outputs.tools }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - id: list
         env:
           TOOL: ${{ inputs.tool }}
         run: |
           if [ -n "$TOOL" ]; then
+            # Only plain names, so the value is safe in paths and branch names.
+            [[ "$TOOL" =~ ^[A-Za-z0-9._-]+$ ]] || { echo "::error::invalid tool name"; exit 1; }
             [ -f "sources/$TOOL.json" ] || { echo "::error::sources/$TOOL.json not found"; exit 1; }
             tools="$(jq -cn --arg t "$TOOL" '[$t]')"
           else
@@ -40,6 +45,9 @@ jobs:
   update:
     needs: list
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write # push the update/<tool> branch
+      pull-requests: write # open the PR
     strategy:
       fail-fast: false
       matrix:
@@ -47,30 +55,34 @@ jobs:
     concurrency:
       group: update-${{ matrix.tool }}
       cancel-in-progress: false
+    env:
+      TOOL: ${{ matrix.tool }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Update sources/${{ matrix.tool }}.json
         id: update
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ inputs.version }}
-        run: bash scripts/update.sh "${{ matrix.tool }}" "$VERSION"
+        run: bash scripts/update.sh "$TOOL" "$VERSION"
 
       - name: Install Nix
         if: steps.update.outputs.updated == 'true'
-        uses: cachix/install-nix-action@v31
+        uses: cachix/install-nix-action@75c75c31ebece974e48ebc36b4ad125bd97bd97b # v31.11.3
 
       - name: Build and smoke-test
         if: steps.update.outputs.updated == 'true'
         run: |
-          nix build ".#${{ matrix.tool }}" --print-build-logs
+          nix build ".#$TOOL" --print-build-logs
           ls -l result/bin
           for bin in result/bin/*; do "$bin" --version; done
 
       - name: Create pull request
         if: steps.update.outputs.updated == 'true'
-        uses: peter-evans/create-pull-request@v8
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
           branch: update/${{ matrix.tool }}
           delete-branch: true
