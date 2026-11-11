@@ -5,7 +5,7 @@
 - Every binary is checked against a pinned SHA-256 hash, taken from the
   upstream checksum file or computed from the downloaded asset.
 - Versions are pinned in `sources/`, not resolved at evaluation time.
-- `flake.lock` pins nixpkgs (only `fetchurl`, `stdenvNoCC` and `buildEnv` are used).
+- `flake.lock` pins the nixpkgs revision used to evaluate and build the flake.
 - The binary is copied into the store unmodified (no strip or patchelf), and no
   upstream install scripts run.
 - A hash only proves the bytes match what was pinned. It doesn't prove who
