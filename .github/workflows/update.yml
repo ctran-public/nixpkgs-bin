@@ -92,4 +92,7 @@ jobs:
           body: |
             Updates `${{ matrix.tool }}` to ${{ steps.update.outputs.version }}.
 
+            - Release notes: ${{ steps.update.outputs.release_url }}
+            - Full diff: ${{ steps.update.outputs.compare_url }}
+
             Hashes refreshed by `scripts/update.sh`; the x86_64-linux build was verified in CI.
