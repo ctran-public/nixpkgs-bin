@@ -7,23 +7,23 @@
   "tag": "v{version}",
   "asset": "mise-v{version}-{platform}",
   "checksums": "SHASUMS256.txt",
-  "version": "2026.11.4",
+  "version": "2026.11.6",
   "platforms": {
     "aarch64-darwin": {
       "platform": "macos-arm64",
-      "hash": "sha256-IcJpzTyI4xxWqtf3zNmRa2+nhoOTfZPl0XEpt4PW+WI="
+      "hash": "sha256-i5s0WfMxveHnuDDYKd3dfNpaVYBjED5FH7qfl26RrNs="
     },
     "x86_64-darwin": {
       "platform": "macos-x64",
-      "hash": "sha256-8W806dxJjOI69gPvAGZjgljZZZiWuECH/xzhWFwBIjg="
+      "hash": "sha256-pQKROhm34ihO2aofNJQ0JFkp8M065TrP0wCwrSgEPHE="
     },
     "aarch64-linux": {
       "platform": "linux-arm64-musl",
-      "hash": "sha256-oMAbC2Fnrlre02NVVYC9qbQQpkreHSXYg4CqmyE0Gu0="
+      "hash": "sha256-Zc4v+OIbuE8RGxhAZyQMgz9GnhjGNRxbz11MQian+t8="
     },
     "x86_64-linux": {
       "platform": "linux-x64-musl",
-      "hash": "sha256-y9e4Oa9DcJSE4W5jBWMQk7ZzoO43yYn/zWk0a9qDFGY="
+      "hash": "sha256-+n1eXK0ifA52+JMXLrhzlkxGR4Xg/PurgYzfBYgjRX0="
     }
   }
 }
