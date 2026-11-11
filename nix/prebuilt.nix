@@ -14,6 +14,7 @@ let
   tag = fill source.tag;
   asset = fill source.asset;
   mainProgram = source.mainProgram or pname;
+  wrapped = (source.wrapperEnvironment or {}) != {};
 in
 stdenvNoCC.mkDerivation (finalAttrs: {
   inherit pname;
@@ -29,20 +30,24 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   dontStrip = true;
   dontPatchELF = true;
 
-  nativeBuildInputs = lib.optional ((source.wrapperEnvironment or {}) != {}) makeWrapper;
+  nativeBuildInputs = lib.optional wrapped makeWrapper;
 
+  # Wrapped tools keep the real binary under its own name in libexec: some
+  # (e.g. mise) inspect their executable name, which wrapProgram would turn
+  # into .<name>-wrapped.
   installPhase = ''
     runHook preInstall
-    install -Dm755 "$src" "$out/bin/${mainProgram}"
+    ${if wrapped then ''
+      install -Dm755 "$src" "$out/libexec/${pname}/${mainProgram}"
+      makeWrapper "$out/libexec/${pname}/${mainProgram}" "$out/bin/${mainProgram}" ${
+        lib.concatStringsSep " " (lib.mapAttrsToList
+          (name: value: "--set ${lib.escapeShellArg name} ${lib.escapeShellArg value}")
+          source.wrapperEnvironment)
+      }
+    '' else ''
+      install -Dm755 "$src" "$out/bin/${mainProgram}"
+    ''}
     runHook postInstall
-  '';
-
-  postInstall = lib.optionalString ((source.wrapperEnvironment or {}) != {}) ''
-    wrapProgram "$out/bin/${mainProgram}" ${
-      lib.concatStringsSep " " (lib.mapAttrsToList
-        (name: value: "--set ${lib.escapeShellArg name} ${lib.escapeShellArg value}")
-        source.wrapperEnvironment)
-    }
   '';
 
   # The binary runs and reports the packaged version.
