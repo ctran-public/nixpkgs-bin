@@ -1,5 +1,6 @@
 # nixpkgs-bin
 
+[![CI](https://github.com/ctran/nixpkgs-bin/actions/workflows/ci.yml/badge.svg)](https://github.com/ctran/nixpkgs-bin/actions/workflows/ci.yml)
 [![Update tools](https://github.com/ctran/nixpkgs-bin/actions/workflows/update.yml/badge.svg)](https://github.com/ctran/nixpkgs-bin/actions/workflows/update.yml)
 
 Prebuilt upstream binaries packaged for Nix. This is a small personal package
