@@ -33,14 +33,17 @@
     in
     {
       packages = forAllSystems (pkgs:
-        let tools = mkPackages pkgs pkgs.stdenv.hostPlatform.system; in
-        tools // {
-          default = tools.mise;
+        let
+          tools = mkPackages pkgs pkgs.stdenv.hostPlatform.system;
           # Every tool in one profile entry: `nix profile add .#all`
           all = pkgs.buildEnv {
             name = "nixpkgs-bin-all";
             paths = builtins.attrValues tools;
           };
+        in
+        tools // {
+          inherit all;
+          default = all;
         });
 
       # Adds (or overrides) pkgs.<name> for each tool.

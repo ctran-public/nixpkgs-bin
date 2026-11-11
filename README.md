@@ -49,7 +49,7 @@ nix profile add github:ctran/nixpkgs-bin#all    # every tool in the flake
 nix run github:ctran/nixpkgs-bin#mise -- --version
 ```
 
-`#default` is mise. To work from a local checkout:
+`#default` is `#all`. To work from a local checkout:
 
 ```bash
 git clone https://github.com/ctran/nixpkgs-bin.git
