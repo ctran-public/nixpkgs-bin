@@ -147,6 +147,7 @@ file, for each system the file lists.
 | `platforms.<system>.platform` | What `{platform}` becomes for that Nix system |
 | `platforms.<system>.hash` | SRI hash of the asset. The updater fills it in; leave `""` for a new tool. |
 | `mainProgram` | Name of the installed binary (default: the file name) |
+| `wrapperEnvironment` | Environment variables set by a wrapper script (optional; only affects variables the binary supports) |
 | `license` | An attribute of `lib.licenses` (default: `unfree`) |
 | `description`, `homepage` | Package metadata (optional) |
 

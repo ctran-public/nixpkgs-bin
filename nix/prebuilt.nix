@@ -1,6 +1,6 @@
 # Package a single prebuilt executable from a GitHub release, described by
 # a sources/<name>.json file.
-{ lib, stdenvNoCC, fetchurl, testers, pname, source }:
+{ lib, stdenvNoCC, fetchurl, testers, makeWrapper, pname, source }:
 
 let
   system = stdenvNoCC.hostPlatform.system;
@@ -29,10 +29,20 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   dontStrip = true;
   dontPatchELF = true;
 
+  nativeBuildInputs = lib.optional ((source.wrapperEnvironment or {}) != {}) makeWrapper;
+
   installPhase = ''
     runHook preInstall
     install -Dm755 "$src" "$out/bin/${mainProgram}"
     runHook postInstall
+  '';
+
+  postInstall = lib.optionalString ((source.wrapperEnvironment or {}) != {}) ''
+    wrapProgram "$out/bin/${mainProgram}" ${
+      lib.concatStringsSep " " (lib.mapAttrsToList
+        (name: value: "--set ${lib.escapeShellArg name} ${lib.escapeShellArg value}")
+        source.wrapperEnvironment)
+    }
   '';
 
   # The binary runs and reports the packaged version.
