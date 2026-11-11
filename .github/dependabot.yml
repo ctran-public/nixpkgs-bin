@@ -1,6 +1,7 @@
 version: 2
 updates:
-  # Bumps the SHA-pinned actions in .github/workflows and their "# vX.Y.Z" comments.
+  # Bumps the action version tags in .github/workflows. Commit SHAs are pinned
+  # in .github/workflows/actions.lock, which is verified in CI.
   - package-ecosystem: github-actions
     directory: /
     schedule:
