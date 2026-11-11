@@ -8,8 +8,8 @@
 #
 # Env:   SOURCES_DIR   directory with <name>.json files (default: repo sources/)
 #        GITHUB_TOKEN  optional, raises the GitHub API rate limit
-#        GITHUB_OUTPUT when set, receives updated=true|false and version=X
-#                      (single-tool mode only)
+#        GITHUB_OUTPUT when set, receives updated=true|false, version=X,
+#                      release_url=URL and compare_url=URL (single-tool mode only)
 #
 # Hashes come from the release's checksum file when the source names one
 # ("checksums"), otherwise each asset is downloaded and hashed.
@@ -69,6 +69,8 @@ update_one() {
   fi
   tag="$(fill "$tag_tpl" "$version")"
   output version "$version"
+  output release_url "https://github.com/$repo/releases/tag/$tag"
+  output compare_url "https://github.com/$repo/compare/$(fill "$tag_tpl" "$current")...$tag"
 
   if [ "$current" = "$version" ] && ! jq -e '.platforms[] | select(.hash == "")' "$file" >/dev/null; then
     echo "$name: already at $version"
