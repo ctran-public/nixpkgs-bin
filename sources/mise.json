@@ -4,6 +4,9 @@
   "homepage": "https://mise.jdx.dev",
   "license": "mit",
   "mainProgram": "mise",
+  "wrapperEnvironment": {
+    "MISE_SELF_UPDATE_AVAILABLE": "false"
+  },
   "tag": "v{version}",
   "asset": "mise-v{version}-{platform}",
   "checksums": "SHASUMS256.txt",
