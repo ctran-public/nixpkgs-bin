@@ -37,3 +37,17 @@ jobs:
       # system and runs its version test
       - name: Check flake
         run: nix flake check --print-build-logs
+
+  # Single required status check for the branch ruleset. Aggregates the matrix
+  # so adding/removing a platform doesn't require editing the ruleset.
+  required:
+    name: ci/required
+    if: always()
+    needs: check
+    runs-on: ubuntu-24.04
+    permissions: {}
+    steps:
+      - name: Require all checks to succeed
+        env:
+          RESULT: ${{ needs.check.result }}
+        run: test "$RESULT" = success
