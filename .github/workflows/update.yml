@@ -87,8 +87,8 @@ jobs:
           branch: update/${{ matrix.tool }}
           delete-branch: true
           add-paths: sources/${{ matrix.tool }}.json
-          commit-message: "${{ matrix.tool }}: update to ${{ steps.update.outputs.version }}"
-          title: "${{ matrix.tool }}: update to ${{ steps.update.outputs.version }}"
+          commit-message: "chore(${{ matrix.tool }}): update to ${{ steps.update.outputs.version }}"
+          title: "chore(${{ matrix.tool }}): update to ${{ steps.update.outputs.version }}"
           body: |
             Updates `${{ matrix.tool }}` to ${{ steps.update.outputs.version }}.
 
