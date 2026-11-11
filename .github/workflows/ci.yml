@@ -26,28 +26,49 @@ jobs:
           - ubuntu-24.04-arm # aarch64-linux
           - macos-15 # aarch64-darwin
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
 
       - name: Install Nix
-        uses: cachix/install-nix-action@75c75c31ebece974e48ebc36b4ad125bd97bd97b # v31.11.3
+        uses: cachix/install-nix-action@v31.11.3
 
       # Evaluates all outputs and runs `checks`: builds every package for this
       # system and runs its version test
       - name: Check flake
         run: nix flake check --print-build-logs
 
-  # Single required status check for the branch ruleset. Aggregates the matrix
+  # Fails when .github/workflows/actions.lock is out of sync with the workflows
+  # or a locked pin no longer verifies upstream.
+  verify-lockfile:
+    name: verify actions lockfile
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install gh-actions-lock
+        run: gh extension install github/gh-actions-lock --pin v0.4.1
+
+      - name: Verify lockfile
+        run: gh actions-lock --verify
+
+  # Single required status check for the branch ruleset. Aggregates all jobs
   # so adding/removing a platform doesn't require editing the ruleset.
   required:
     name: ci/required
     if: always()
-    needs: check
+    needs: [check, verify-lockfile]
     runs-on: ubuntu-24.04
     permissions: {}
     steps:
       - name: Require all checks to succeed
         env:
-          RESULT: ${{ needs.check.result }}
-        run: test "$RESULT" = success
+          CHECK_RESULT: ${{ needs.check.result }}
+          LOCKFILE_RESULT: ${{ needs.verify-lockfile.result }}
+        run: test "$CHECK_RESULT" = success && test "$LOCKFILE_RESULT" = success
