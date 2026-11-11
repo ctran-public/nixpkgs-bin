@@ -1,6 +1,6 @@
 # Package a single prebuilt executable from a GitHub release, described by
 # a sources/<name>.json file.
-{ lib, stdenvNoCC, fetchurl, pname, source }:
+{ lib, stdenvNoCC, fetchurl, testers, pname, source }:
 
 let
   system = stdenvNoCC.hostPlatform.system;
@@ -15,7 +15,7 @@ let
   asset = fill source.asset;
   mainProgram = source.mainProgram or pname;
 in
-stdenvNoCC.mkDerivation {
+stdenvNoCC.mkDerivation (finalAttrs: {
   inherit pname;
   inherit (source) version;
 
@@ -35,6 +35,12 @@ stdenvNoCC.mkDerivation {
     runHook postInstall
   '';
 
+  # The binary runs and reports the packaged version.
+  passthru.tests.version = testers.testVersion {
+    package = finalAttrs.finalPackage;
+    command = "${mainProgram} ${source.versionArg or "--version"}";
+  };
+
   meta = {
     description = source.description or pname;
     homepage = source.homepage or "https://github.com/${source.repo}";
@@ -44,4 +50,4 @@ stdenvNoCC.mkDerivation {
     platforms = builtins.attrNames source.platforms;
     inherit mainProgram;
   };
-}
+})

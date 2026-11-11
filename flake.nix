@@ -46,6 +46,10 @@
       # Adds (or overrides) pkgs.<name> for each tool.
       overlays.default = final: prev: mkPackages final prev.stdenv.hostPlatform.system;
 
-      checks = forAllSystems (pkgs: mkPackages pkgs pkgs.stdenv.hostPlatform.system);
+      # Every package builds, and its binary runs and reports its version.
+      checks = forAllSystems (pkgs:
+        let tools = mkPackages pkgs pkgs.stdenv.hostPlatform.system; in
+        tools // lib.mapAttrs' (name: tool:
+          lib.nameValuePair "${name}-version" tool.tests.version) tools);
     };
 }
