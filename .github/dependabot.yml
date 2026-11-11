@@ -5,6 +5,9 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # Skip versions released in the last 7 days.
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: ci
     groups:
