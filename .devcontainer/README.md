@@ -11,7 +11,7 @@ When you open this repository in GitHub Codespaces, Nix will be automatically in
 To set up locally, ensure you have Nix installed with flakes support:
 
 ```bash
-# Enter the Nix development environment
+# Inspect the flake outputs
 nix flake show
 
 # Build all packages

@@ -15,10 +15,9 @@
       ],
       "settings": {
         "nix.enableLanguageServer": true,
-        "nix.linter": "statix"
       }
     }
   },
-  "postCreateCommand": "nix flake update nixpkgs",
-  "remoteUser": "root"
+  "postCreateCommand": "nix flake show"
+"remoteUser": "vscode"
 }
