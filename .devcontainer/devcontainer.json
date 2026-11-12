@@ -18,6 +18,6 @@
       }
     }
   },
-  "postCreateCommand": "nix flake show",
-"remoteUser": "vscode"
+  "postCreateCommand": "",
+  "remoteUser": "vscode"
 }
