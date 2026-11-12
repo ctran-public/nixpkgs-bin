@@ -64,7 +64,7 @@ jobs:
     name: ci/required
     if: always()
     needs: [check, verify-lockfile]
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     permissions: {}
     steps:
       - name: Require all checks to succeed
