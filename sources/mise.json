@@ -16,10 +16,6 @@
       "platform": "macos-arm64",
       "hash": "sha256-i5s0WfMxveHnuDDYKd3dfNpaVYBjED5FH7qfl26RrNs="
     },
-    "x86_64-darwin": {
-      "platform": "macos-x64",
-      "hash": "sha256-pQKROhm34ihO2aofNJQ0JFkp8M065TrP0wCwrSgEPHE="
-    },
     "aarch64-linux": {
       "platform": "linux-arm64-musl",
       "hash": "sha256-Zc4v+OIbuE8RGxhAZyQMgz9GnhjGNRxbz11MQian+t8="
