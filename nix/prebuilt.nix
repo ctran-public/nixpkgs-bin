@@ -34,12 +34,13 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
   # Wrapped tools keep the real binary under its own name in libexec: some
   # (e.g. mise) inspect their executable name, which wrapProgram would turn
-  # into .<name>-wrapped.
+  # into .<name>-wrapped. __MISE_BIN makes `mise activate` emit the wrapper
+  # path instead of the libexec path, so the shell function keeps the env.
   installPhase = ''
     runHook preInstall
     ${if wrapped then ''
       install -Dm755 "$src" "$out/libexec/${pname}/${mainProgram}"
-      makeWrapper "$out/libexec/${pname}/${mainProgram}" "$out/bin/${mainProgram}" --inherit-argv0 ${
+      makeWrapper "$out/libexec/${pname}/${mainProgram}" "$out/bin/${mainProgram}" --inherit-argv0 --set __MISE_BIN "$out/bin/${mainProgram}" ${
         lib.concatStringsSep " " (lib.mapAttrsToList
           (name: value: "--set ${lib.escapeShellArg name} ${lib.escapeShellArg value}")
           source.wrapperEnvironment)
