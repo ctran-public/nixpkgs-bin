@@ -39,7 +39,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     runHook preInstall
     ${if wrapped then ''
       install -Dm755 "$src" "$out/libexec/${pname}/${mainProgram}"
-      makeWrapper "$out/libexec/${pname}/${mainProgram}" "$out/bin/${mainProgram}" ${
+      makeWrapper "$out/libexec/${pname}/${mainProgram}" "$out/bin/${mainProgram}" --inherit-argv0 ${
         lib.concatStringsSep " " (lib.mapAttrsToList
           (name: value: "--set ${lib.escapeShellArg name} ${lib.escapeShellArg value}")
           source.wrapperEnvironment)
