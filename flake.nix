@@ -7,9 +7,7 @@
     let
       inherit (nixpkgs) lib;
 
-      # x86_64-darwin is left out because nixpkgs-unstable (26.11) no longer
-      # evaluates it. Intel Macs can still use `overlays.default` on a nixpkgs
-      # that supports them (e.g. nixpkgs-26.05-darwin); the sources keep its hashes.
+      # Intel Macs (x86_64-darwin) are not supported.
       systems = [ "aarch64-darwin" "aarch64-linux" "x86_64-linux" ];
 
       # One package per sources/<name>.json

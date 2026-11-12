@@ -32,12 +32,8 @@ echo 'experimental-features = nix-command flakes' >> ~/.config/nix/nix.conf
 | `aarch64-darwin` | `macos-arm64` | yes | yes |
 | `aarch64-linux` | `linux-arm64-musl` | yes | yes |
 | `x86_64-linux` | `linux-x64-musl` | yes | yes |
-| `x86_64-darwin` | `macos-x64` | no¹ | yes |
 
-¹ nixpkgs-unstable (26.11) no longer evaluates `x86_64-darwin`, so the flake
-doesn't expose packages for it. Intel Macs can apply `overlays.default` to a
-nixpkgs that still supports them, such as `nixpkgs-26.05-darwin`; the hashes
-are kept in `sources/mise.json`.
+Intel Macs (`x86_64-darwin`) are not supported.
 
 Linux uses statically linked musl binaries.
 
