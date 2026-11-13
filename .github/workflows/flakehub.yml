@@ -1,14 +1,26 @@
-name: "Publish every Git push to main to FlakeHub"
+name: flakehub
 
 on:
-  push:
-    branches:
-      - "main"
+  workflow_run:
+    workflows: ["ci"]
+    types: [completed]
+    branches: [main]
 
 permissions: {}
 
+concurrency:
+  group: flakehub
+  cancel-in-progress: false
+
 jobs:
   flakehub-publish:
+    name: publish to flakehub
+    # Only publish main pushes whose ci run succeeded, and only from the
+    # upstream repository.
+    if: >-
+      github.repository == 'ctran-public/nixpkgs-bin'
+      && github.event.workflow_run.event == 'push'
+      && github.event.workflow_run.conclusion == 'success'
     runs-on: "ubuntu-24.04"
     permissions:
       id-token: "write"
@@ -16,6 +28,7 @@ jobs:
     steps:
       - uses: "actions/checkout@v7.0.1"
         with:
+          ref: ${{ github.event.workflow_run.head_sha }}
           persist-credentials: false
       - uses: "DeterminateSystems/determinate-nix-action@v3.24.2"
       - uses: "DeterminateSystems/flakehub-push@v7"
@@ -24,3 +37,4 @@ jobs:
           rolling: true
           visibility: "public"
           include-output-paths: true
+          rev: ${{ github.event.workflow_run.head_sha }}
