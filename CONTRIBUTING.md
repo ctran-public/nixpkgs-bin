@@ -102,3 +102,16 @@ keeps installs reproducible.
 - Versions and hashes must change together, and sources must be pinned.
 - Workflows: pin action versions, use minimal permissions, and add new jobs to
   the `ci/required` needs list.
+
+## Beads
+
+Issue tracking uses [beads](https://github.com/gastownhall/beads) (`bd`). Git
+only runs the hooks in `.beads/hooks` when pointed at them. After cloning, run
+once:
+
+```bash
+git config core.hooksPath .beads/hooks
+```
+
+The hooks skip themselves when `bd` is not installed. The devcontainer sets this
+automatically.
