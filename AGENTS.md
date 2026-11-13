@@ -1,8 +1,3 @@
 # Agent instructions
 
-Shared instructions live in `.claude/rules/`. Read and follow every file there.
-
-- `general.md`: always applies.
-- `beads.md`: always applies.
-- `nix.md`: applies when touching `*.nix`, `nix/**`, `sources/**`, or `flake.lock`.
-- `workflows.md`: applies when touching `.github/workflows/**`.
+Read and follow every file in `.claude/rules/`. `nix.md` and `workflows.md` apply only to the paths in their `paths` frontmatter.

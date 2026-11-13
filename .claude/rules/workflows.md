@@ -3,7 +3,7 @@ paths:
   - ".github/workflows/**"
 ---
 
-# GitHub Actions workflows
+# Workflows
 
 - Pin action versions.
 - Use minimal permissions.

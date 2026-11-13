@@ -8,5 +8,5 @@ paths:
 
 # Nix
 
-- Versions and hashes must change together.
-- Sources must be pinned.
+- Change versions and hashes together.
+- Pin sources.

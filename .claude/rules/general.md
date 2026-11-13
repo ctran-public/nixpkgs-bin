@@ -1,5 +1,5 @@
 # General
 
-- Never use emojis in any output (code, commits, PRs, chat).
-- Be direct. No praise, filler, or restating the diff.
-- Use conventional commit format for commit messages and PR titles.
+- No emojis anywhere (code, commits, PRs, chat).
+- Be direct: no praise, filler, or restating the diff.
+- Conventional commits for commit messages and PR titles.
