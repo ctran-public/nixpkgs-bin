@@ -1,0 +1,26 @@
+name: "Publish every Git push to main to FlakeHub"
+
+on:
+  push:
+    branches:
+      - "main"
+
+permissions: {}
+
+jobs:
+  flakehub-publish:
+    runs-on: "ubuntu-24.04"
+    permissions:
+      id-token: "write"
+      contents: "read"
+    steps:
+      - uses: "actions/checkout@v7.0.1"
+        with:
+          persist-credentials: false
+      - uses: "DeterminateSystems/determinate-nix-action@v3.24.2"
+      - uses: "DeterminateSystems/flakehub-push@v7"
+        with:
+          name: "ctran-public/nixpkgs-bin"
+          rolling: true
+          visibility: "public"
+          include-output-paths: true
