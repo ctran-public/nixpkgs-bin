@@ -18,6 +18,6 @@
       }
     }
   },
-  "postCreateCommand": "",
+  "postCreateCommand": "git config core.hooksPath .beads/hooks",
   "remoteUser": "vscode"
 }
