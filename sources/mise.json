@@ -10,19 +10,19 @@
   "tag": "v{version}",
   "asset": "mise-v{version}-{platform}",
   "checksums": "SHASUMS256.txt",
-  "version": "2026.11.8",
+  "version": "2026.11.9",
   "platforms": {
     "aarch64-darwin": {
       "platform": "macos-arm64",
-      "hash": "sha256-PjkOy89/A+kecskgokig8UnwDXeuldN+oXNqHHtC/uY="
+      "hash": "sha256-87sOjL4CF6C1JETswAQjZFY93R3gSQMTu35wLsq0GhQ="
     },
     "aarch64-linux": {
       "platform": "linux-arm64-musl",
-      "hash": "sha256-P+vWE7bkn5KKzazaAGZizuJS8WDrw/xI9RlyYOYdx1g="
+      "hash": "sha256-sV5SyShaB4VPToHsfigWJbVrDCPkwOilU+sOBv5K4KM="
     },
     "x86_64-linux": {
       "platform": "linux-x64-musl",
-      "hash": "sha256-H+ZEiambYie39+Z65N0yk8IOy7zXSxNnRWAQNZOD5xI="
+      "hash": "sha256-5V3iw3oIqd/bPKlUkPkPkUte82K2J2HxuyEQ5dVyEPc="
     }
   }
 }
