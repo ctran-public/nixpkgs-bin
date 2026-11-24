@@ -38,6 +38,29 @@ jobs:
       - name: Check flake
         run: nix flake check --print-build-logs
 
+  # Lints the shell script and the Nix files. Tools come from nixpkgs so their
+  # versions match the rest of the flake.
+  lint:
+    name: lint
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31.11.5
+
+      - name: Shellcheck update script
+        run: nix shell nixpkgs#shellcheck -c shellcheck scripts/update.sh
+
+      - name: Nix format and lint
+        run: |
+          nix shell nixpkgs#nixfmt nixpkgs#statix -c nixfmt --check flake.nix nix/prebuilt.nix
+          nix shell nixpkgs#statix -c statix check flake.nix nix/prebuilt.nix
+
   # Fails when .github/workflows/actions.lock is out of sync with the workflows
   # or a locked pin no longer verifies upstream.
   verify-lockfile:
@@ -63,12 +86,16 @@ jobs:
   required:
     name: ci/required
     if: always()
-    needs: [check, verify-lockfile]
+    needs: [check, lint, verify-lockfile]
     runs-on: ubuntu-slim
     permissions: {}
     steps:
       - name: Require all checks to succeed
         env:
           CHECK_RESULT: ${{ needs.check.result }}
+          LINT_RESULT: ${{ needs.lint.result }}
           LOCKFILE_RESULT: ${{ needs.verify-lockfile.result }}
-        run: test "$CHECK_RESULT" = success && test "$LOCKFILE_RESULT" = success
+        run: |
+          test "$CHECK_RESULT" = success \
+            && test "$LINT_RESULT" = success \
+            && test "$LOCKFILE_RESULT" = success
