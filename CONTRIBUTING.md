@@ -8,6 +8,7 @@ nixpkgs-bin/
 ├── flake.lock                # pins nixpkgs
 ├── nix/prebuilt.nix          # generic builder for one prebuilt release binary
 ├── sources/
+│   ├── jq.json               # per-tool data: repo, version, assets, hashes
 │   └── mise.json             # per-tool data: repo, version, assets, hashes
 ├── scripts/update.sh         # bump sources/*.json to a release
 └── .github/workflows/update.yml

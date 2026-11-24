@@ -8,7 +8,8 @@ set, not an official NixOS project and not part of nixpkgs.
 
 Each tool is installed straight from its **official prebuilt binaries** on
 GitHub Releases instead of being built from source. It currently ships
-[mise](https://mise.jdx.dev/), as an alternative to `nixpkgs#mise`.
+[mise](https://mise.jdx.dev/), as an alternative to `nixpkgs#mise`, and
+[jq](https://jqlang.org/).
 
 - **Prebuilt binaries** — no Rust (or any) toolchain needed.
 - **Pinned and verified** — every binary has a fixed version and SHA-256 hash.
