@@ -1,20 +1,25 @@
 # Package a single prebuilt executable from a GitHub release, described by
 # a sources/<name>.json file.
-{ lib, stdenvNoCC, fetchurl, testers, makeWrapper, pname, source }:
+{
+  lib,
+  stdenvNoCC,
+  fetchurl,
+  testers,
+  makeWrapper,
+  pname,
+  source,
+}:
 
 let
   system = stdenvNoCC.hostPlatform.system;
-  target = source.platforms.${system}
-    or (throw "${pname}: no prebuilt binary for ${system}");
+  target = source.platforms.${system} or (throw "${pname}: no prebuilt binary for ${system}");
 
-  fill = builtins.replaceStrings
-    [ "{version}" "{platform}" ]
-    [ source.version target.platform ];
+  fill = builtins.replaceStrings [ "{version}" "{platform}" ] [ source.version target.platform ];
 
   tag = fill source.tag;
   asset = fill source.asset;
   mainProgram = source.mainProgram or pname;
-  wrapped = (source.wrapperEnvironment or {}) != {};
+  wrapped = (source.wrapperEnvironment or { }) != { };
 in
 stdenvNoCC.mkDerivation (finalAttrs: {
   inherit pname;
@@ -38,16 +43,23 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   # path instead of the libexec path, so the shell function keeps the env.
   installPhase = ''
     runHook preInstall
-    ${if wrapped then ''
-      install -Dm755 "$src" "$out/libexec/${pname}/${mainProgram}"
-      makeWrapper "$out/libexec/${pname}/${mainProgram}" "$out/bin/${mainProgram}" --inherit-argv0 --set __MISE_BIN "$out/bin/${mainProgram}" ${
-        lib.concatStringsSep " " (lib.mapAttrsToList
-          (name: value: "--set ${lib.escapeShellArg name} ${lib.escapeShellArg value}")
-          source.wrapperEnvironment)
-      }
-    '' else ''
-      install -Dm755 "$src" "$out/bin/${mainProgram}"
-    ''}
+    ${
+      if wrapped then
+        ''
+          install -Dm755 "$src" "$out/libexec/${pname}/${mainProgram}"
+          makeWrapper "$out/libexec/${pname}/${mainProgram}" "$out/bin/${mainProgram}" --inherit-argv0 --set __MISE_BIN "$out/bin/${mainProgram}" ${
+            lib.concatStringsSep " " (
+              lib.mapAttrsToList (
+                name: value: "--set ${lib.escapeShellArg name} ${lib.escapeShellArg value}"
+              ) source.wrapperEnvironment
+            )
+          }
+        ''
+      else
+        ''
+          install -Dm755 "$src" "$out/bin/${mainProgram}"
+        ''
+    }
     runHook postInstall
   '';
 

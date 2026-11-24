@@ -59,7 +59,8 @@ jobs:
       - name: Nix format and lint
         run: |
           nix shell nixpkgs#nixfmt nixpkgs#statix -c nixfmt --check flake.nix nix/prebuilt.nix
-          nix shell nixpkgs#statix -c statix check flake.nix nix/prebuilt.nix
+          nix shell nixpkgs#statix -c statix check flake.nix
+          nix shell nixpkgs#statix -c statix check nix/prebuilt.nix
 
   # Fails when .github/workflows/actions.lock is out of sync with the workflows
   # or a locked pin no longer verifies upstream.
