@@ -1,0 +1,25 @@
+{
+  "repo": "jqlang/jq",
+  "description": "Command-line JSON processor",
+  "homepage": "https://jqlang.org/",
+  "license": "mit",
+  "mainProgram": "jq",
+  "tag": "jq-{version}",
+  "asset": "jq-{platform}",
+  "checksums": "sha256sum.txt",
+  "version": "1.8.2",
+  "platforms": {
+    "aarch64-darwin": {
+      "platform": "macos-arm64",
+      "hash": "sha256-LXU0C6V6S0tMhwiiHC3I6VikiqqLuhOyf3f25MDsoH4="
+    },
+    "aarch64-linux": {
+      "platform": "linux-arm64",
+      "hash": "sha256-i4XIF4M4FN3KAKFEwzcFVGNVr8zwzzmxiPPNtIuFIwk="
+    },
+    "x86_64-linux": {
+      "platform": "linux-amd64",
+      "hash": "sha256-scIhct0wPzvknpNapWqkiot6RuC8g4tJl9O7RRSVhw8="
+    }
+  }
+}
