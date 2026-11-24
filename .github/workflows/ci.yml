@@ -58,12 +58,73 @@ jobs:
       - name: Verify lockfile
         run: gh actions-lock --verify
 
+  # Re-runs scripts/update.sh for every tool at its committed version with the
+  # hashes cleared, and fails if the recomputed hashes differ or the release is
+  # missing. Catches hash and version drift before the scheduled update does.
+  # Does nothing unless the PR touches scripts/ or sources/.
+  update-dry-run:
+    name: update dry-run
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Check whether scripts or sources changed
+        id: changed
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if [ "$EVENT" != pull_request ]; then
+            echo "not a pull request; skipping"
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if git diff --quiet "$BASE...HEAD" -- scripts sources; then
+            echo "no changes under scripts/ or sources/; skipping"
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install xxd
+        if: steps.changed.outputs.run == 'true'
+        run: command -v xxd >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq xxd; }
+
+      - name: Re-hash each source at its pinned version
+        if: steps.changed.outputs.run == 'true'
+        run: |
+          work="$RUNNER_TEMP/sources"
+          mkdir -p "$work"
+          status=0
+          for file in sources/*.json; do
+            name="$(basename "$file" .json)"
+            version="$(jq -r .version "$file")"
+            echo "::group::$name $version"
+            # Work on a copy with empty hashes so update.sh recomputes them
+            # even though the version is unchanged.
+            jq '.platforms[].hash = ""' "$file" > "$work/$name.json"
+            if ! SOURCES_DIR="$work" scripts/update.sh "$name" "$version"; then
+              echo "::error file=$file::could not download release $version or hash its assets"
+              status=1
+            elif ! cmp -s <(jq -S . "$file") <(jq -S . "$work/$name.json"); then
+              echo "::error file=$file::committed hashes do not match the release assets"
+              status=1
+            fi
+            echo "::endgroup::"
+          done
+          exit "$status"
+
   # Single required status check for the branch ruleset. Aggregates all jobs
   # so adding/removing a platform doesn't require editing the ruleset.
   required:
     name: ci/required
     if: always()
-    needs: [check, verify-lockfile]
+    needs: [check, verify-lockfile, update-dry-run]
     runs-on: ubuntu-slim
     permissions: {}
     steps:
@@ -71,4 +132,5 @@ jobs:
         env:
           CHECK_RESULT: ${{ needs.check.result }}
           LOCKFILE_RESULT: ${{ needs.verify-lockfile.result }}
-        run: test "$CHECK_RESULT" = success && test "$LOCKFILE_RESULT" = success
+          DRY_RUN_RESULT: ${{ needs.update-dry-run.result }}
+        run: test "$CHECK_RESULT" = success && test "$LOCKFILE_RESULT" = success && test "$DRY_RUN_RESULT" = success
