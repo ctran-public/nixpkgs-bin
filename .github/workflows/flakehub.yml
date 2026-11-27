@@ -16,11 +16,13 @@ jobs:
   flakehub-publish:
     name: publish to flakehub
     # Only publish main pushes whose ci run succeeded, and only from the
-    # upstream repository.
+    # upstream repository. Actions-only bumps (see dependabot.yml) leave the
+    # packages unchanged, so they are skipped.
     if: >-
       github.repository == 'ctran-public/nixpkgs-bin'
       && github.event.workflow_run.event == 'push'
       && github.event.workflow_run.conclusion == 'success'
+      && !startsWith(github.event.workflow_run.head_commit.message, 'ci(actions):')
     runs-on: "ubuntu-24.04"
     permissions:
       id-token: "write"
