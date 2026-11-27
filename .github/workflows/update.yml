@@ -71,7 +71,7 @@ jobs:
 
       - name: Install Nix
         if: steps.update.outputs.updated == 'true'
-        uses: cachix/install-nix-action@v31.11.5
+        uses: cachix/install-nix-action@v32.0.0
 
       - name: Build and smoke-test
         if: steps.update.outputs.updated == 'true'
