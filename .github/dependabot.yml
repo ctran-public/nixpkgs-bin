@@ -9,8 +9,9 @@ updates:
     # Skip versions released in the last 7 days.
     cooldown:
       default-days: 7
+    # flakehub.yml skips publishing commits with this prefix.
     commit-message:
-      prefix: ci
+      prefix: ci(actions)
     groups:
       actions:
         patterns: ["*"]
